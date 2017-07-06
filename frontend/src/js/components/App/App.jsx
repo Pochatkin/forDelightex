@@ -86,6 +86,7 @@ class App extends Component {
 
         ctx.strokeStyle = "#000000";
         ctx.beginPath();
+        ctx.lineWidth = "1";
         ctx.moveTo(x1, 500);
         ctx.lineTo(x1, 500 - height);
         ctx.lineTo(x2, 500 - height);
@@ -97,16 +98,12 @@ class App extends Component {
         const {ctx, x1, x2, nextXleft, height} = props;
 
         
-        ctx.beginPath();
-        ctx.strokeStyle = "#0000FF";
-        ctx.lineWidth = "3";
         ctx.lineTo(x1, 500 - height);
         ctx.lineTo(x2, 500 - height);
         if (nextXleft !== x2) {
             ctx.lineTo(x2, 500);
             ctx.lineTo(nextXleft, 500);
         }
-        ctx.stroke();
     }
 
     updateCanvas() {
@@ -124,13 +121,14 @@ class App extends Component {
         ctx.lineWidth = "3";
         ctx.moveTo(0, 500);
         ctx.lineTo(self.state.counterSky[keys[0]].leftPoint, 500);
-        ctx.stroke();
         for (let i = 0; i < keys.length; i++) {
             let skyElement = this.state.counterSky[keys[i]];
             console.log(skyElement);
-
-            this.drawSky({ctx, x1: skyElement.leftPoint, x2: skyElement.rightPoint, nextXleft: (i + 1 === keys.length) ? 1100 : this.state.counterSky[keys[i+1]].leftPoint, height: skyElement.height});
+            if (skyElement.leftPoint != skyElement.rightPoint) {
+                this.drawSky({ctx, x1: skyElement.leftPoint, x2: skyElement.rightPoint, nextXleft: (i + 1 === keys.length) ? 1100 : this.state.counterSky[keys[i+1]].leftPoint, height: skyElement.height});
+            }
         }
+        ctx.stroke();
         this.setState({
             check: !this.state.check 
         });
