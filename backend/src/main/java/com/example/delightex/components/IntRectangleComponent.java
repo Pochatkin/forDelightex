@@ -7,7 +7,7 @@ import java.util.LinkedList;
 /**
  * Created by mikhail on 05.07.17.
  */
-public class IntRectangleComponent {
+public class IntRectangleComponent<T> {
     private LinkedList<IntRectangle> allRectangle;
     private LinkedList<IntRectangle> counterSky;
 
@@ -16,16 +16,24 @@ public class IntRectangleComponent {
         counterSky = new LinkedList<>();
     }
 
-    public void refreshCounterSky() {
+    public void refresh() {
+        this.allRectangle = new LinkedList<>();
         this.counterSky = new LinkedList<>();
     }
 
     public void generateRectangle(int n, int maxRangeX, int maxRangeY) {
         for (int i = 0; i < n; i++) {
             IntRectangle newRectangle = new IntRectangle(maxRangeX, maxRangeY);
-            if (i == 0) counterSky.add(newRectangle);
             allRectangle.addLast(newRectangle);
         }
+    }
+
+    private void log(String message, IntRectangle candidate, IntRectangle elemList) {
+        System.out.println("--------------");
+        System.out.println(message);
+        System.out.println("candidate: " + candidate.toString());
+        System.out.println("that have: " + elemList.toString());
+        System.out.println("--------------");
     }
 
     public void generateCounterSky() {
@@ -35,48 +43,80 @@ public class IntRectangleComponent {
         allRectangle.add(new IntRectangle(867, 960, 366));
         allRectangle.add(new IntRectangle(994, 1005, 162));
         allRectangle.add(new IntRectangle(996, 1073, 395));*/
+        LinkedList<IntRectangle> listCandidate = new LinkedList<>(allRectangle);
         loop:
-        for (int j = 1; j < allRectangle.size(); j++) {
-            IntRectangle candidate = allRectangle.get(j);
+        for (int j = 0; j < listCandidate.size(); j++) {
+            IntRectangle candidate = listCandidate.get(j);
 
             if (counterSky.size() == 0) {
-                counterSky.add(candidate);
+                log("First add", candidate, candidate);
+                counterSky.add(new IntRectangle(candidate));
+                continue;
             }
 
             for (int i = 0; i < counterSky.size(); i++) {
                 IntRectangle counterRectangle = counterSky.get(i);
+                log("Start", candidate, counterRectangle);
+                if (candidate.equals(counterRectangle)) {
+                    log("Equals", candidate, counterRectangle);
+                    continue;
+                }
                 if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getRightPoint()) {
-                    if (candidate.getHeight() > counterRectangle.getHeight()) {
-                        if (candidate.getRightPoint() > counterRectangle.getRightPoint()) {
-                            counterSky.add(i + 1, new IntRectangle(candidate.getLeftPoint(), counterRectangle.getRightPoint(), candidate.getHeight()));
+                    if (candidate.getRightPoint() > counterRectangle.getRightPoint()) {
+                        if (candidate.getHeight() > counterRectangle.getHeight()) {
+                            log("First, Before", candidate, counterRectangle);
+                            counterSky.addLast(new IntRectangle(candidate.getLeftPoint(), counterRectangle.getRightPoint(), candidate.getHeight()));
                             int temp = counterRectangle.getRightPoint();
                             counterRectangle.setRightPoint(candidate.getLeftPoint());
                             candidate.setLeftPoint(temp);
-                            //Остался неиспользованный кусок
-                            if (i + 2 == counterSky.size()) {
-                                counterSky.add(i + 2, candidate);
-                                continue loop;
-                            }
+                            log("First, After", candidate, counterRectangle);
                         } else {
-                            counterSky.add(i + 1, candidate);
-                            counterSky.add(i + 2, new IntRectangle(candidate.getRightPoint(), counterRectangle.getRightPoint(), counterRectangle.getHeight()));
-                            counterRectangle.setRightPoint(candidate.getLeftPoint());
-                            continue loop;
-                        }
-                    }
-                } else {
-                    if (candidate.getLeftPoint() >= counterRectangle.getRightPoint()) {
-                        if (i + 1 != counterSky.size()) {
-                            if (candidate.getRightPoint() <= counterSky.get(i + 1).getLeftPoint()) {
-                                counterSky.add(i + 1, candidate);
-                            }
-                        } else {
-                            counterSky.add(i + 1, candidate);
-                            continue loop;
+                            candidate.setLeftPoint(counterRectangle.getRightPoint());
                         }
                     }
                 }
+                if (candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() >= counterRectangle.getRightPoint() && candidate.getHeight() > counterRectangle.getHeight()) {
+                    log("Remove", candidate, counterRectangle);
+                    counterSky.remove(i);
+                    i--;
+                }
+                if (candidate.getRightPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
+                    if (candidate.getHeight() > counterRectangle.getHeight()) {
+                        log("Second, Before", candidate, counterRectangle);
+                        counterSky.addLast(new IntRectangle(counterRectangle.getLeftPoint(), candidate.getRightPoint(), candidate.getHeight()));
+                        int temp = counterRectangle.getLeftPoint();
+                        counterRectangle.setLeftPoint(candidate.getRightPoint());
+                        candidate.setRightPoint(temp);
+                        log("Second, After", candidate, counterRectangle);
+                    } else {
+                        candidate.setRightPoint(counterRectangle.getLeftPoint());
+                    }
+                }
+                if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
+                    if (candidate.getHeight() > counterRectangle.getHeight()) {
+                        log("Six, Before", candidate, counterRectangle);
+                        counterSky.addLast(new IntRectangle(candidate));
+                        counterSky.addLast(new IntRectangle(candidate.getRightPoint(), counterRectangle.getRightPoint(), counterRectangle.getHeight()));
+                        counterRectangle.setRightPoint(candidate.getLeftPoint());
+                        log("Six, After", counterSky.getLast(), counterRectangle);
+                        continue loop;
+                    }
+                }
+                if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint() && candidate.getHeight() < counterRectangle.getHeight()) {
+                    continue loop;
+                }
+                if (candidate.getLeftPoint() < counterRectangle.getLeftPoint() && candidate.getRightPoint() > counterRectangle.getRightPoint() && candidate.getHeight() < counterRectangle.getHeight()) {
+                    listCandidate.addLast(new IntRectangle(candidate.getLeftPoint(), counterRectangle.getLeftPoint(), candidate.getHeight()));
+                    listCandidate.addLast(new IntRectangle(counterRectangle.getRightPoint(), candidate.getRightPoint(), candidate.getHeight()));
+                    continue loop;
+                }
                 if (candidate.getLeftPoint() == candidate.getRightPoint()) {
+                    log("candidate out", candidate, counterRectangle);
+                    continue loop;
+                }
+                if (i + 1 == counterSky.size()) {
+                    log("Last", candidate, counterRectangle);
+                    counterSky.addLast(new IntRectangle(candidate));
                     continue loop;
                 }
             }

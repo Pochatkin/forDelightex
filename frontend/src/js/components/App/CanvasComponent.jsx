@@ -12,6 +12,8 @@ function drawRectangle(props) {
 class CanvasComponent extends Component {
 	constructor(props) {
 		super(props);
+		console.log(props);
+		console.log(this.props);
 		this.state = {
 			allRectangle : this.props.allRectangle,
 			counterSky : this.props.counterSky
@@ -26,6 +28,7 @@ class CanvasComponent extends Component {
     updateCanvas() {
         const ctx = this.refs.canvas.getContext('2d');
         for (let rectangle in this.state.allRectangle) {
+        	console.log(rectangle);
         	drawRectangle({ctx, x1: rectangle.leftPoint, x2: rectangle.rightPoint, height: rectangle.height});
         }
     }

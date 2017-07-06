@@ -26,13 +26,12 @@ public class IntegerPointsController {
 
     @Autowired
     public IntegerPointsController(RequestRepository requestRepository) {
-        this.requestRepository = requestRepository;
         this.intRectangleComponent = new IntRectangleComponent();
+        this.requestRepository = requestRepository;
     }
 
     @RequestMapping(value = "/getCounterSky", method = RequestMethod.GET)
     public ResponseEntity<List<IntRectangle>> getCounterSky() {
-        intRectangleComponent.refreshCounterSky();
         intRectangleComponent.generateCounterSky();
 
         return new ResponseEntity<>(intRectangleComponent.getCounterSky(), HttpStatus.OK);
@@ -40,6 +39,7 @@ public class IntegerPointsController {
 
     @RequestMapping(value = "/generateRectangle", method = RequestMethod.POST)
     public ResponseEntity<List<IntRectangle>> generateIntRectangle(@RequestBody Request request) {
+        intRectangleComponent.refresh();
         intRectangleComponent.generateRectangle(request.getNumber(), request.getMaxRangeX(), request.getMaxRangeY());
 
         return new ResponseEntity<>(intRectangleComponent.getAllRectangle(), HttpStatus.OK);

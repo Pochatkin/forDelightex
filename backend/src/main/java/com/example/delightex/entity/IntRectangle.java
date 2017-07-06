@@ -27,6 +27,42 @@ public class IntRectangle {
 
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IntRectangle that = (IntRectangle) o;
+
+        if (leftPoint != that.leftPoint) return false;
+        if (rightPoint != that.rightPoint) return false;
+        return height == that.height;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = leftPoint;
+        result = 31 * result + rightPoint;
+        result = 31 * result + height;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "IntRectangle{" +
+                "leftPoint=" + leftPoint +
+                ", rightPoint=" + rightPoint +
+                ", height=" + height +
+                '}';
+    }
+
+    public IntRectangle(IntRectangle intRectangle) {
+        this.leftPoint = intRectangle.getLeftPoint();
+        this.rightPoint = intRectangle.getRightPoint();
+        this.height = intRectangle.getHeight();
+    }
+
     public void setLeftPoint(int leftPoint) {
         this.leftPoint = leftPoint;
     }
