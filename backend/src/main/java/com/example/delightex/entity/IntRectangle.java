@@ -48,15 +48,6 @@ public class IntRectangle {
         return result;
     }
 
-    @Override
-    public String toString() {
-        return "IntRectangle{" +
-                "leftPoint=" + leftPoint +
-                ", rightPoint=" + rightPoint +
-                ", height=" + height +
-                '}';
-    }
-
     public IntRectangle(IntRectangle intRectangle) {
         this.leftPoint = intRectangle.getLeftPoint();
         this.rightPoint = intRectangle.getRightPoint();

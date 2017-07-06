@@ -1,14 +1,8 @@
 import React, { Component } from 'react';
-import CanvasComponent from './CanvasComponent';
 import Grid from 'react-bootstrap/lib/Grid';
-import Nav from 'react-bootstrap/lib/Nav';
 import Navbar from 'react-bootstrap/lib/Navbar';
-import NavItem  from 'react-bootstrap/lib/NavItem';
-import FormControl from 'react-bootstrap/lib/FormControl';
 import Button from 'react-bootstrap/lib/Button';
 import ButtonToolbar from 'react-bootstrap/lib/ButtonToolbar';
-import { Link, browserHistory } from 'react-router';
-import FormGroup from 'react-bootstrap/lib/FormGroup';
 import Well from 'react-bootstrap/lib/Well';
 import './bootstrap.css';
 
@@ -23,13 +17,19 @@ class App extends Component {
             check : false
             
         }
-        this.generateIntRectangleAndCounterSky = this.generateIntRectangleAndCounterSky.bind(this);
-        this.generateRealReactangleAndCounterSky = this.generateRealReactangleAndCounterSky.bind(this);
+        this.generateRectangleAndCounterSky = this.generateRectangleAndCounterSky.bind(this);
+        this.updateCanvasForDrawSkyCounter = this.updateCanvasForDrawSkyCounter.bind(this);
     };
 
-    generateIntRectangleAndCounterSky() {
+    generateRectangleAndCounterSky(isInt) {
         let self = this;
-        fetch('http://localhost:8090/intPoints/generateRectangle', {
+        let url;
+        if (isInt) {
+            url = "http://localhost:8090/intPoints";
+        } else {
+            url = "http://localhost:8090/realPoints";
+        }
+        fetch(url + '/generateRectangle', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -46,7 +46,7 @@ class App extends Component {
                     self.setState({
                         allRectangle: data 
                     });
-                    fetch('http://localhost:8090/intPoints/getCounterSky', {
+                    fetch(url + '/getCounterSky', {
                         method: 'GET',
                         headers: {
                             'Accept': 'application/json',
@@ -57,7 +57,7 @@ class App extends Component {
                             response.json().then(function(data) {
                                 self.setState({
                                     counterSky: data 
-                                }, function() {self.updateCanvas()});
+                                }, function() {self.updateCanvasForDrawRectangle()});
                             })
                         }
                     });
@@ -68,17 +68,7 @@ class App extends Component {
         
     }
 
-    generateRealReactangleAndCounterSky() {
-        fetch('http://localhost:8090/realPoints/', {
-            method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-            body: JSON.stringify({
-                code: "code"})
-        })
-    }
+    
 
     drawRectangle(props) {
         const {ctx, x1, x2, height} = props;
@@ -106,31 +96,39 @@ class App extends Component {
         }
     }
 
-    updateCanvas() {
-        let self = this;
+    updateCanvasForDrawRectangle() {
         const ctx = document.getElementById("canvas").getContext("2d");
         ctx.clearRect(0, 0, 1100, 500);
         for (let rectangleIndex in this.state.allRectangle) {
             let rectangle = this.state.allRectangle[rectangleIndex];
+            console.log(rectangle);
             this.drawRectangle({ctx, x1: rectangle.leftPoint, x2: rectangle.rightPoint, height: rectangle.height, color: "#000000"});
         }
+        
+        this.setState({
+            check: true 
+        });
+    }
+
+    updateCanvasForDrawSkyCounter() {
+        let self = this;
+        const ctx = document.getElementById("canvas").getContext("2d");
         let keys = Object.keys(self.state.counterSky);
         keys.sort(function(a, b) {return self.state.counterSky[a].leftPoint - self.state.counterSky[b].leftPoint});       
         ctx.beginPath();
         ctx.strokeStyle = "#0000FF";
-        ctx.lineWidth = "3";
+        ctx.lineWidth = "1";
         ctx.moveTo(0, 500);
         ctx.lineTo(self.state.counterSky[keys[0]].leftPoint, 500);
         for (let i = 0; i < keys.length; i++) {
             let skyElement = this.state.counterSky[keys[i]];
-            console.log(skyElement);
-            if (skyElement.leftPoint != skyElement.rightPoint) {
+            if (skyElement.leftPoint !== skyElement.rightPoint) {
                 this.drawSky({ctx, x1: skyElement.leftPoint, x2: skyElement.rightPoint, nextXleft: (i + 1 === keys.length) ? 1100 : this.state.counterSky[keys[i+1]].leftPoint, height: skyElement.height});
             }
         }
         ctx.stroke();
         this.setState({
-            check: !this.state.check 
+            check: false 
         });
     }
 
@@ -151,14 +149,22 @@ class App extends Component {
                     <Well>
                         <canvas id="canvas" width={1100} height={500}/>    
                     </Well>
-                    <ButtonToolbar>
-                        <Button bsStyle='success' onClick={this.generateIntRectangleAndCounterSky}>
-                            {"Integer points"}
-                        </Button>
-                        <Button bsStyle='success' onClick={this.generateRealReactangleAndCounterSky}>
-                            {"Real points"}
-                        </Button>
-                    </ButtonToolbar>
+                    <div>
+                        <ButtonToolbar>
+                            <Button onClick={() => this.generateRectangleAndCounterSky(true)}>
+                                {"Integer points"}
+                            </Button>
+                            <Button onClick={() => this.generateRectangleAndCounterSky(false)}>
+                                {"Real points"}
+                            </Button>
+                        </ButtonToolbar>
+
+                        <ButtonToolbar>
+                            <Button bsStyle='success' onClick={this.updateCanvasForDrawSkyCounter} disabled={!this.state.check}>
+                                {"Draw sky counter"}
+                            </Button>
+                        </ButtonToolbar>
+                    </div>
                 </Grid>    
             </div>
         ); 
