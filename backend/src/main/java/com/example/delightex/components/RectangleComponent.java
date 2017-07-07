@@ -1,23 +1,18 @@
 package com.example.delightex.components;
 
-import com.example.delightex.entity.IntRectangle;
-import com.example.delightex.entity.RealRectangle;
-import org.springframework.stereotype.Component;
+import com.example.delightex.entity.Rectangle;
 
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
 
 /**
- * Created by mikhail on 05.07.17.
+ * Created by mikhail on 07.07.17.
  */
-@Component
-public class RealRectangleComponent {
-    private LinkedList<RealRectangle> allRectangle;
-    private LinkedList<RealRectangle> counterSky;
+public class RectangleComponent {
+    private LinkedList<Rectangle> allRectangle;
+    private LinkedList<Rectangle> counterSky;
 
-    public RealRectangleComponent() {
+    public RectangleComponent() {
         allRectangle = new LinkedList<>();
         counterSky = new LinkedList<>();
     }
@@ -27,26 +22,26 @@ public class RealRectangleComponent {
         this.counterSky = new LinkedList<>();
     }
 
-    public void generateRectangle(int n, int maxRangeX, int maxRangeY) {
+    public void generateRectangle(boolean isIntPoints, int n, int maxRangeX, int maxRangeY) {
         for (int i = 0; i < n; i++) {
-            RealRectangle newRectangle = new RealRectangle(maxRangeX, maxRangeY);
+            Rectangle newRectangle = new Rectangle(isIntPoints, maxRangeX, maxRangeY);
             allRectangle.addLast(newRectangle);
         }
     }
 
     public void generateCounterSky() {
-        LinkedList<RealRectangle> listCandidate = new LinkedList<>(allRectangle);
+        LinkedList<Rectangle> listCandidate = new LinkedList<>(allRectangle);
         loop:
         for (int j = 0; j < listCandidate.size(); j++) {
-            RealRectangle candidate = listCandidate.get(j);
+            Rectangle candidate = listCandidate.get(j);
 
             if (counterSky.size() == 0) {
-                counterSky.add(new RealRectangle(candidate));
+                counterSky.add(new Rectangle(candidate));
                 continue;
             }
 
-            for (ListIterator<RealRectangle> iterator = counterSky.listIterator(); iterator.hasNext(); ) {
-                RealRectangle counterRectangle = iterator.next();
+            for (ListIterator<Rectangle> iterator = counterSky.listIterator(); iterator.hasNext(); ) {
+                Rectangle counterRectangle = iterator.next();
                 if (candidate.equals(counterRectangle)) {
                     continue;
                 }
@@ -56,7 +51,7 @@ public class RealRectangleComponent {
                 if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getRightPoint() > counterRectangle.getRightPoint()) {
                         if (candidate.getHeight() > counterRectangle.getHeight()) {
-                            iterator.add(new RealRectangle(candidate.getLeftPoint(), counterRectangle.getRightPoint(), candidate.getHeight()));
+                            iterator.add(new Rectangle(candidate.getLeftPoint(), counterRectangle.getRightPoint(), candidate.getHeight()));
 
                             double temp = counterRectangle.getRightPoint();
                             counterRectangle.setRightPoint(candidate.getLeftPoint());
@@ -69,7 +64,7 @@ public class RealRectangleComponent {
 
                 if (candidate.getRightPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getHeight() > counterRectangle.getHeight()) {
-                        iterator.add(new RealRectangle(counterRectangle.getLeftPoint(), candidate.getRightPoint(), candidate.getHeight()));
+                        iterator.add(new Rectangle(counterRectangle.getLeftPoint(), candidate.getRightPoint(), candidate.getHeight()));
                         double temp = counterRectangle.getLeftPoint();
                         counterRectangle.setLeftPoint(candidate.getRightPoint());
                         candidate.setRightPoint(temp);
@@ -79,8 +74,8 @@ public class RealRectangleComponent {
                 }
                 if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getHeight() > counterRectangle.getHeight()) {
-                        iterator.add(new RealRectangle(candidate));
-                        iterator.add(new RealRectangle(candidate.getRightPoint(), counterRectangle.getRightPoint(), counterRectangle.getHeight()));
+                        iterator.add(new Rectangle(candidate));
+                        iterator.add(new Rectangle(candidate.getRightPoint(), counterRectangle.getRightPoint(), counterRectangle.getHeight()));
                         counterRectangle.setRightPoint(candidate.getLeftPoint());
                         continue loop;
                     }
@@ -89,22 +84,22 @@ public class RealRectangleComponent {
                     continue loop;
                 }
                 if (candidate.getLeftPoint() < counterRectangle.getLeftPoint() && candidate.getRightPoint() > counterRectangle.getRightPoint() && candidate.getHeight() < counterRectangle.getHeight()) {
-                    listCandidate.addLast(new RealRectangle(candidate.getLeftPoint(), counterRectangle.getLeftPoint(), candidate.getHeight()));
-                    listCandidate.addLast(new RealRectangle(counterRectangle.getRightPoint(), candidate.getRightPoint(), candidate.getHeight()));
+                    listCandidate.addLast(new Rectangle(candidate.getLeftPoint(), counterRectangle.getLeftPoint(), candidate.getHeight()));
+                    listCandidate.addLast(new Rectangle(counterRectangle.getRightPoint(), candidate.getRightPoint(), candidate.getHeight()));
                     continue loop;
                 }
                 if (candidate.getLeftPoint() == candidate.getRightPoint()) {
                     continue loop;
                 }
                 if (!iterator.hasNext()) {
-                    iterator.add(new RealRectangle(candidate));
+                    iterator.add(new Rectangle(candidate));
                     continue loop;
                 }
             }
         }
 
-        for (Iterator<RealRectangle> iterator = counterSky.iterator(); iterator.hasNext(); ) {
-            RealRectangle counterRectangle = iterator.next();
+        for (ListIterator<Rectangle> iterator = counterSky.listIterator(); iterator.hasNext(); ) {
+            Rectangle counterRectangle = iterator.next();
             if (counterRectangle.getLeftPoint() == counterRectangle.getRightPoint()) {
                 iterator.remove();
             }
@@ -112,14 +107,11 @@ public class RealRectangleComponent {
 
     }
 
-    public LinkedList<RealRectangle> getAllRectangle() {
+    public LinkedList<Rectangle> getAllRectangle() {
         return allRectangle;
     }
 
-    public LinkedList<RealRectangle> getCounterSky() {
+    public LinkedList<Rectangle> getCounterSky() {
         return counterSky;
     }
-
-
 }
-

@@ -1,9 +1,8 @@
 package com.example.delightex.controllers;
 
-import com.example.delightex.components.IntRectangleComponent;
-import com.example.delightex.entity.IntRectangle;
+import com.example.delightex.components.RectangleComponent;
+import com.example.delightex.entity.Rectangle;
 import com.example.delightex.entity.Request;
-import com.example.delightex.reps.RequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,26 +20,24 @@ import java.util.List;
 @RequestMapping("/intPoints")
 public class IntegerPointsController {
 
-    private IntRectangleComponent intRectangleComponent;
-    private final RequestRepository requestRepository;
+    private RectangleComponent intRectangleComponent;
 
     @Autowired
-    public IntegerPointsController(RequestRepository requestRepository) {
-        this.intRectangleComponent = new IntRectangleComponent();
-        this.requestRepository = requestRepository;
+    public IntegerPointsController() {
+        this.intRectangleComponent = new RectangleComponent();
     }
 
     @RequestMapping(value = "/getCounterSky", method = RequestMethod.GET)
-    public ResponseEntity<List<IntRectangle>> getCounterSky() {
+    public ResponseEntity<List<Rectangle>> getCounterSky() {
         intRectangleComponent.generateCounterSky();
 
         return new ResponseEntity<>(intRectangleComponent.getCounterSky(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/generateRectangle", method = RequestMethod.POST)
-    public ResponseEntity<List<IntRectangle>> generateIntRectangle(@RequestBody Request request) {
+    public ResponseEntity<List<Rectangle>> generateIntRectangle(@RequestBody Request request) {
         intRectangleComponent.refresh();
-        intRectangleComponent.generateRectangle(request.getNumber(), request.getMaxRangeX(), request.getMaxRangeY());
+        intRectangleComponent.generateRectangle(true, request.getNumber(), request.getMaxRangeX(), request.getMaxRangeY());
 
         return new ResponseEntity<>(intRectangleComponent.getAllRectangle(), HttpStatus.OK);
     }

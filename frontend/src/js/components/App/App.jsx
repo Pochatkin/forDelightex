@@ -109,7 +109,7 @@ class App extends Component {
         ctx.clearRect(0, 0, 1100, 500);
         for (let rectangleIndex in this.state.allRectangle) {
             let rectangle = this.state.allRectangle[rectangleIndex];
-            //console.log(rectangle);
+            console.log(rectangle);
             this.drawRectangle({ctx, x1: rectangle.leftPoint, x2: rectangle.rightPoint, height: rectangle.height, color: "#000000"});
         }
         
