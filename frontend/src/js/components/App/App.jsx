@@ -4,6 +4,9 @@ import Navbar from 'react-bootstrap/lib/Navbar';
 import Button from 'react-bootstrap/lib/Button';
 import ButtonToolbar from 'react-bootstrap/lib/ButtonToolbar';
 import Well from 'react-bootstrap/lib/Well';
+import FormGroup from 'react-bootstrap/lib/FormGroup';
+import FormControl from 'react-bootstrap/lib/FormControl';
+import HelpBlock from 'react-bootstrap/lib/HelpBlock';
 import './bootstrap.css';
 
 
@@ -14,56 +17,59 @@ class App extends Component {
         this.state = {
             allRectangle : null,
             counterSky : null,
-            check : false
-            
+            check : false,
+            number : 0
         }
         this.generateRectangleAndCounterSky = this.generateRectangleAndCounterSky.bind(this);
         this.updateCanvasForDrawSkyCounter = this.updateCanvasForDrawSkyCounter.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     };
 
     generateRectangleAndCounterSky(isInt) {
         let self = this;
         let url;
-        if (isInt) {
-            url = "http://localhost:8090/intPoints";
-        } else {
-            url = "http://localhost:8090/realPoints";
-        }
-        fetch(url + '/generateRectangle', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                number: 5,
-                maxRangeX: 1100,
-                maxRangeY: 500
-            })
-        }).then(function(response) {
-            if(response.status === 200) {
-                response.json().then(function(data) {
-                    self.setState({
-                        allRectangle: data 
-                    });
-                    fetch(url + '/getCounterSky', {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                        }
-                    }).then(function(response) {
-                        if(response.status === 200) {
-                            response.json().then(function(data) {
-                                self.setState({
-                                    counterSky: data 
-                                }, function() {self.updateCanvasForDrawRectangle()});
-                            })
-                        }
-                    });
+        if (this.state.number > 0) {
+            if (isInt) {
+                url = "http://localhost:8090/intPoints";
+            } else {
+                url = "http://localhost:8090/realPoints";
+            } 
+            fetch(url + '/generateRectangle', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    number: this.state.number,
+                    maxRangeX: 1100,
+                    maxRangeY: 500
                 })
-            }
-        });
+            }).then(function(response) {
+                if(response.status === 200) {
+                    response.json().then(function(data) {
+                        self.setState({
+                            allRectangle: data 
+                        });
+                        fetch(url + '/getCounterSky', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            }
+                        }).then(function(response) {
+                            if(response.status === 200) {
+                                response.json().then(function(data) {
+                                    self.setState({
+                                        counterSky: data 
+                                    }, function() {self.updateCanvasForDrawRectangle()});
+                                })
+                            }
+                        });
+                    })
+                }
+            });
+        }
 
         
     }
@@ -87,12 +93,14 @@ class App extends Component {
     drawSky(props) {
         const {ctx, x1, x2, nextXleft, height} = props;
 
-        
-        ctx.lineTo(x1, 500 - height);
-        ctx.lineTo(x2, 500 - height);
-        if (nextXleft !== x2) {
-            ctx.lineTo(x2, 500);
-            ctx.lineTo(nextXleft, 500);
+        if (x1 !== x2) {
+
+            ctx.lineTo(x1, 500 - height);
+            ctx.lineTo(x2, 500 - height);
+            if (nextXleft !== x2) {
+                ctx.lineTo(x2, 500);
+                ctx.lineTo(nextXleft, 500);
+            }
         }
     }
 
@@ -132,6 +140,12 @@ class App extends Component {
         });
     }
 
+    handleChange(e) {
+        this.setState({
+            number : e.target.value 
+        });
+    }
+
     render() {
         return (
             <div>
@@ -149,6 +163,13 @@ class App extends Component {
                     <Well>
                         <canvas id="canvas" width={1100} height={500}/>    
                     </Well>
+                    <form>
+                        <FormGroup controlId="numberRectangle">
+                            <FormControl type="text" value={this.state.number} placeholder="Enter number of rectangle" onChange={this.handleChange}/>
+                            <HelpBlock>Number must be positive integer</HelpBlock>
+
+                        </FormGroup>
+                    </form>
                     <div>
                         <ButtonToolbar>
                             <Button onClick={() => this.generateRectangleAndCounterSky(true)}>
@@ -164,7 +185,7 @@ class App extends Component {
                                 {"Draw sky counter"}
                             </Button>
                         </ButtonToolbar>
-                    </div>
+                    </div>                
                 </Grid>    
             </div>
         ); 
