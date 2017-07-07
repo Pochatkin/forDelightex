@@ -15,8 +15,11 @@ public class IntRectangle {
 
     public IntRectangle(int maxRangeX, int maxRangeY) {
         Random random = new Random();
-        this.leftPoint = random.nextInt(maxRangeX) + 1;
-        this.rightPoint = this.leftPoint + random.nextInt(maxRangeX - this.leftPoint);
+        this.leftPoint = random.nextInt(maxRangeX);
+        this.rightPoint = this.leftPoint + random.nextInt(maxRangeX - this.leftPoint) + 1;
+        if (this.rightPoint >= 1100) {
+            System.out.println(this.rightPoint);
+        }
         this.height = random.nextInt(maxRangeY) + 1;
     }
 

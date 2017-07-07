@@ -109,7 +109,7 @@ class App extends Component {
         ctx.clearRect(0, 0, 1100, 500);
         for (let rectangleIndex in this.state.allRectangle) {
             let rectangle = this.state.allRectangle[rectangleIndex];
-            console.log(rectangle);
+            //console.log(rectangle);
             this.drawRectangle({ctx, x1: rectangle.leftPoint, x2: rectangle.rightPoint, height: rectangle.height, color: "#000000"});
         }
         
@@ -122,7 +122,7 @@ class App extends Component {
         let self = this;
         const ctx = document.getElementById("canvas").getContext("2d");
         let keys = Object.keys(self.state.counterSky);
-        keys.sort(function(a, b) {return self.state.counterSky[a].leftPoint - self.state.counterSky[b].leftPoint});       
+        keys.sort(function(a, b) {return self.state.counterSky[a].leftPoint - self.state.counterSky[b].leftPoint});
         ctx.beginPath();
         ctx.strokeStyle = "#0000FF";
         ctx.lineWidth = "1";

@@ -1,8 +1,11 @@
 package com.example.delightex.components;
 
 import com.example.delightex.entity.IntRectangle;
+import com.example.delightex.entity.RealRectangle;
 
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * Created by mikhail on 05.07.17.
@@ -39,15 +42,18 @@ public class IntRectangleComponent<T> {
                 continue;
             }
 
-            for (int i = 0; i < counterSky.size(); i++) {
-                IntRectangle counterRectangle = counterSky.get(i);
+            for (ListIterator<IntRectangle> iterator = counterSky.listIterator(); iterator.hasNext(); ) {
+                IntRectangle counterRectangle = iterator.next();
                 if (candidate.equals(counterRectangle)) {
                     continue;
+                }
+                if (candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() >= counterRectangle.getRightPoint() && candidate.getHeight() > counterRectangle.getHeight()) {
+                    iterator.remove();
                 }
                 if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getRightPoint() > counterRectangle.getRightPoint()) {
                         if (candidate.getHeight() > counterRectangle.getHeight()) {
-                            counterSky.addLast(new IntRectangle(candidate.getLeftPoint(), counterRectangle.getRightPoint(), candidate.getHeight()));
+                            iterator.add(new IntRectangle(candidate.getLeftPoint(), counterRectangle.getRightPoint(), candidate.getHeight()));
                             int temp = counterRectangle.getRightPoint();
                             counterRectangle.setRightPoint(candidate.getLeftPoint());
                             candidate.setLeftPoint(temp);
@@ -56,13 +62,9 @@ public class IntRectangleComponent<T> {
                         }
                     }
                 }
-                if (candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() >= counterRectangle.getRightPoint() && candidate.getHeight() > counterRectangle.getHeight()) {
-                    counterSky.remove(i);
-                    i--;
-                }
                 if (candidate.getRightPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getHeight() > counterRectangle.getHeight()) {
-                        counterSky.addLast(new IntRectangle(counterRectangle.getLeftPoint(), candidate.getRightPoint(), candidate.getHeight()));
+                        iterator.add(new IntRectangle(counterRectangle.getLeftPoint(), candidate.getRightPoint(), candidate.getHeight()));
                         int temp = counterRectangle.getLeftPoint();
                         counterRectangle.setLeftPoint(candidate.getRightPoint());
                         candidate.setRightPoint(temp);
@@ -72,8 +74,8 @@ public class IntRectangleComponent<T> {
                 }
                 if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getHeight() > counterRectangle.getHeight()) {
-                        counterSky.addLast(new IntRectangle(candidate));
-                        counterSky.addLast(new IntRectangle(candidate.getRightPoint(), counterRectangle.getRightPoint(), counterRectangle.getHeight()));
+                        iterator.add(new IntRectangle(candidate));
+                        iterator.add(new IntRectangle(candidate.getRightPoint(), counterRectangle.getRightPoint(), counterRectangle.getHeight()));
                         counterRectangle.setRightPoint(candidate.getLeftPoint());
                         continue loop;
                     }
@@ -89,10 +91,17 @@ public class IntRectangleComponent<T> {
                 if (candidate.getLeftPoint() == candidate.getRightPoint()) {
                     continue loop;
                 }
-                if (i + 1 == counterSky.size()) {
-                    counterSky.addLast(new IntRectangle(candidate));
+                if (!iterator.hasNext()) {
+                    iterator.add(new IntRectangle(candidate));
                     continue loop;
                 }
+            }
+        }
+
+        for (Iterator<IntRectangle> iterator = counterSky.iterator(); iterator.hasNext(); ) {
+            IntRectangle counterRectangle = iterator.next();
+            if (counterRectangle.getLeftPoint() == counterRectangle.getRightPoint()) {
+                iterator.remove();
             }
         }
 
