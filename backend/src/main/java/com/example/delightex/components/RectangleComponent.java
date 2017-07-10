@@ -25,9 +25,13 @@ public class RectangleComponent {
     public void generateRectangle(boolean isIntPoints, int n, int maxRangeX, int maxRangeY) {
         for (int i = 0; i < n; i++) {
             Rectangle newRectangle = new Rectangle(isIntPoints, maxRangeX, maxRangeY);
+            System.out.println("+++++++++++++++++++");
+            System.out.println(newRectangle.toString());
+            System.out.println("+++++++++++++++++++");
             allRectangle.addLast(newRectangle);
         }
     }
+
 
     public void generateCounterSky() {
         LinkedList<Rectangle> listCandidate = new LinkedList<>(allRectangle);
@@ -48,9 +52,11 @@ public class RectangleComponent {
                 if (candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() >= counterRectangle.getRightPoint()) {
                     if (candidate.getHeight() >= counterRectangle.getHeight()) {
                         iterator.remove();
-                        if(iterator.hasPrevious()) {
+                        if (iterator.hasPrevious()) {
                             iterator.previous();
-
+                        }
+                        if (counterSky.size() == 0) {
+                            iterator.add(new Rectangle(candidate));
                         }
                         continue;
                     }
@@ -58,12 +64,14 @@ public class RectangleComponent {
                 if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() < counterRectangle.getRightPoint()) {
                     if (candidate.getRightPoint() > counterRectangle.getRightPoint()) {
                         if (candidate.getHeight() > counterRectangle.getHeight()) {
-                            iterator.add(new Rectangle(candidate.getLeftPoint(), counterRectangle.getRightPoint(), candidate.getHeight()));
 
+                            Rectangle toAdd = new Rectangle(candidate.getLeftPoint(), counterRectangle.getRightPoint(), candidate.getHeight());
 
                             double temp = counterRectangle.getRightPoint();
                             counterRectangle.setRightPoint(candidate.getLeftPoint());
                             candidate.setLeftPoint(temp);
+                            iterator.set(new Rectangle(counterRectangle));
+                            iterator.add(toAdd);
                             iterator.previous();
                             continue;
 
@@ -75,10 +83,12 @@ public class RectangleComponent {
 
                 if (candidate.getRightPoint() > counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getHeight() > counterRectangle.getHeight()) {
-                        iterator.add(new Rectangle(counterRectangle.getLeftPoint(), candidate.getRightPoint(), candidate.getHeight()));
+                        Rectangle toAdd = new Rectangle(counterRectangle.getLeftPoint(), candidate.getRightPoint(), candidate.getHeight());
                         double temp = counterRectangle.getLeftPoint();
                         counterRectangle.setLeftPoint(candidate.getRightPoint());
+                        iterator.set(new Rectangle(counterRectangle));
                         candidate.setRightPoint(temp);
+                        iterator.add(toAdd);
                         iterator.previous();
                         continue;
 
@@ -89,20 +99,24 @@ public class RectangleComponent {
                 if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getHeight() > counterRectangle.getHeight()) {
                         iterator.add(new Rectangle(candidate));
-                        iterator.previous();
+                        //iterator.previous();
                         iterator.add(new Rectangle(candidate.getRightPoint(), counterRectangle.getRightPoint(), counterRectangle.getHeight()));
                         counterRectangle.setRightPoint(candidate.getLeftPoint());
-                        iterator.previous();
-                        continue;
+                        //iterator.previous();
+                        continue loop;
                     }
-                    continue loop;
                 }
-                if (candidate.getLeftPoint() < counterRectangle.getLeftPoint() && candidate.getRightPoint() > counterRectangle.getRightPoint() && candidate.getHeight() < counterRectangle.getHeight()) {
-                    listCandidate.addLast(new Rectangle(candidate.getLeftPoint(), counterRectangle.getLeftPoint(), candidate.getHeight()));
-                    listCandidate.addLast(new Rectangle(counterRectangle.getRightPoint(), candidate.getRightPoint(), candidate.getHeight()));
-                    continue loop;
+                if (candidate.getLeftPoint() < counterRectangle.getLeftPoint() && candidate.getRightPoint() > counterRectangle.getRightPoint()) {
+                    if (candidate.getHeight() < counterRectangle.getHeight()) {
+                        listCandidate.addLast(new Rectangle(candidate.getLeftPoint(), counterRectangle.getLeftPoint(), candidate.getHeight()));
+                        listCandidate.addLast(new Rectangle(counterRectangle.getRightPoint(), candidate.getRightPoint(), candidate.getHeight()));
+                        continue loop;
+                    }
                 }
                 if (candidate.getLeftPoint() == candidate.getRightPoint()) {
+                    continue loop;
+                }
+                if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint() && candidate.getHeight() <= counterRectangle.getHeight()) {
                     continue loop;
                 }
                 if (!iterator.hasNext()) {
@@ -112,6 +126,9 @@ public class RectangleComponent {
                 }
             }
         }
+        System.out.println("---------------");
+        System.out.println();
+        System.out.println("---------------");
 
         for (ListIterator<Rectangle> iterator = counterSky.listIterator(); iterator.hasNext(); ) {
             Rectangle counterRectangle = iterator.next();
