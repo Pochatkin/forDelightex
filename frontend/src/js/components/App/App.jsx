@@ -93,7 +93,7 @@ class App extends Component {
     drawSky(props) {
         const {ctx, x1, x2, nextXleft, height} = props;
 
-        if (x1 !== x2) {
+        if (x1 <= x2) {
 
             ctx.lineTo(x1, 500 - height);
             ctx.lineTo(x2, 500 - height);
@@ -109,7 +109,6 @@ class App extends Component {
         ctx.clearRect(0, 0, 1100, 500);
         for (let rectangleIndex in this.state.allRectangle) {
             let rectangle = this.state.allRectangle[rectangleIndex];
-            console.log(rectangle);
             this.drawRectangle({ctx, x1: rectangle.leftPoint, x2: rectangle.rightPoint, height: rectangle.height, color: "#000000"});
         }
         
@@ -130,6 +129,13 @@ class App extends Component {
         ctx.lineTo(self.state.counterSky[keys[0]].leftPoint, 500);
         for (let i = 0; i < keys.length; i++) {
             let skyElement = this.state.counterSky[keys[i]];
+            if (i + 1 != keys.length && skyElement.rightPoint > this.state.counterSky[keys[i + 1]].leftPoint) {
+                if (skyElement.height <= this.state.counterSky[keys[i + 1]].height) {
+                    continue;
+                } else {
+                    i++;
+                }
+            } 
             if (skyElement.leftPoint !== skyElement.rightPoint) {
                 this.drawSky({ctx, x1: skyElement.leftPoint, x2: skyElement.rightPoint, nextXleft: (i + 1 === keys.length) ? 1100 : this.state.counterSky[keys[i+1]].leftPoint, height: skyElement.height});
             }

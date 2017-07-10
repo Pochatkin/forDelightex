@@ -45,29 +45,43 @@ public class RectangleComponent {
                 if (candidate.equals(counterRectangle)) {
                     continue;
                 }
-                if (candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() >= counterRectangle.getRightPoint() && candidate.getHeight() > counterRectangle.getHeight()) {
-                    iterator.remove();
+                if (candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() >= counterRectangle.getRightPoint()) {
+                    if (candidate.getHeight() >= counterRectangle.getHeight()) {
+                        iterator.remove();
+                        if(iterator.hasPrevious()) {
+                            iterator.previous();
+
+                        }
+                        continue;
+                    }
                 }
-                if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getRightPoint()) {
+                if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() < counterRectangle.getRightPoint()) {
                     if (candidate.getRightPoint() > counterRectangle.getRightPoint()) {
                         if (candidate.getHeight() > counterRectangle.getHeight()) {
                             iterator.add(new Rectangle(candidate.getLeftPoint(), counterRectangle.getRightPoint(), candidate.getHeight()));
 
+
                             double temp = counterRectangle.getRightPoint();
                             counterRectangle.setRightPoint(candidate.getLeftPoint());
                             candidate.setLeftPoint(temp);
+                            iterator.previous();
+                            continue;
+
                         } else {
                             candidate.setLeftPoint(counterRectangle.getRightPoint());
                         }
                     }
                 }
 
-                if (candidate.getRightPoint() >= counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
+                if (candidate.getRightPoint() > counterRectangle.getLeftPoint() && candidate.getLeftPoint() <= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getHeight() > counterRectangle.getHeight()) {
                         iterator.add(new Rectangle(counterRectangle.getLeftPoint(), candidate.getRightPoint(), candidate.getHeight()));
                         double temp = counterRectangle.getLeftPoint();
                         counterRectangle.setLeftPoint(candidate.getRightPoint());
                         candidate.setRightPoint(temp);
+                        iterator.previous();
+                        continue;
+
                     } else {
                         candidate.setRightPoint(counterRectangle.getLeftPoint());
                     }
@@ -75,12 +89,12 @@ public class RectangleComponent {
                 if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint()) {
                     if (candidate.getHeight() > counterRectangle.getHeight()) {
                         iterator.add(new Rectangle(candidate));
+                        iterator.previous();
                         iterator.add(new Rectangle(candidate.getRightPoint(), counterRectangle.getRightPoint(), counterRectangle.getHeight()));
                         counterRectangle.setRightPoint(candidate.getLeftPoint());
-                        continue loop;
+                        iterator.previous();
+                        continue;
                     }
-                }
-                if (candidate.getLeftPoint() >= counterRectangle.getLeftPoint() && candidate.getRightPoint() <= counterRectangle.getRightPoint() && candidate.getHeight() < counterRectangle.getHeight()) {
                     continue loop;
                 }
                 if (candidate.getLeftPoint() < counterRectangle.getLeftPoint() && candidate.getRightPoint() > counterRectangle.getRightPoint() && candidate.getHeight() < counterRectangle.getHeight()) {
@@ -93,7 +107,8 @@ public class RectangleComponent {
                 }
                 if (!iterator.hasNext()) {
                     iterator.add(new Rectangle(candidate));
-                    continue loop;
+                    iterator.previous();
+                    continue;
                 }
             }
         }
