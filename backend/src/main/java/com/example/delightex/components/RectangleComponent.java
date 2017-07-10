@@ -25,9 +25,6 @@ public class RectangleComponent {
     public void generateRectangle(boolean isIntPoints, int n, int maxRangeX, int maxRangeY) {
         for (int i = 0; i < n; i++) {
             Rectangle newRectangle = new Rectangle(isIntPoints, maxRangeX, maxRangeY);
-            System.out.println("+++++++++++++++++++");
-            System.out.println(newRectangle.toString());
-            System.out.println("+++++++++++++++++++");
             allRectangle.addLast(newRectangle);
         }
     }
@@ -126,9 +123,6 @@ public class RectangleComponent {
                 }
             }
         }
-        System.out.println("---------------");
-        System.out.println();
-        System.out.println("---------------");
 
         for (ListIterator<Rectangle> iterator = counterSky.listIterator(); iterator.hasNext(); ) {
             Rectangle counterRectangle = iterator.next();

@@ -127,10 +127,8 @@ class App extends Component {
         ctx.lineWidth = "1";
         ctx.moveTo(0, 500);
         ctx.lineTo(self.state.counterSky[keys[0]].leftPoint, 500);
-        console.log("-----------------");
         for (let i = 0; i < keys.length; i++) {
             let skyElement = this.state.counterSky[keys[i]];
-            console.log(skyElement);
             if (i + 1 != keys.length && skyElement.rightPoint > this.state.counterSky[keys[i + 1]].leftPoint) {
                 if (skyElement.height <= this.state.counterSky[keys[i + 1]].height) {
                     continue;
